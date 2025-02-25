@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import sqlite3
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 app.secret_key = 'your_secret_key'
 
 def init_db():
@@ -22,13 +24,14 @@ def init_db():
 
 @app.route('/')
 def home():
-    if 'username' in session:
-        return render_template('index.html', username=session['username'])
-    return redirect(url_for('login'))
+    return jsonify({"message": "Welcome to SpaceTech Backend API"})
 
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+    
     name = data.get('name')
     department = data.get('department')
     year = data.get('year')
@@ -46,6 +49,9 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+    
     name = data.get('name')
     password = data.get('password')
 
